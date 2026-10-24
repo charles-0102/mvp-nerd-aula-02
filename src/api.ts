@@ -96,8 +96,16 @@ export const api = {
   profile: (admin: boolean) => rpc<Profile>(admin, "current_profile"),
   list: (admin: boolean) => allPages<Demand>(admin, "list_requests"),
   counts: (admin: boolean) => rpc<Counts>(admin, "counts"),
-  get: (admin: boolean, id: string) =>
-    rpc<Demand>(admin, "get_request", { p_request_id: id }),
-  comments: (admin: boolean, id: string) =>
-    allPages<Comment>(admin, "list_comments", { p_request_id: id }),
+  get: async (admin: boolean, id: string) => {
+    validateId(id);
+    return rpc<Demand>(admin, "get_request", { p_request_id: id });
+  },
+  comments: async (admin: boolean, id: string) => {
+    validateId(id);
+    return allPages<Comment>(admin, "list_comments", { p_request_id: id });
+  },
 };
+function validateId(id: string) {
+  if (!/^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/i.test(id))
+    throw Error("NOT_FOUND_OR_DENIED");
+}

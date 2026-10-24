@@ -136,6 +136,7 @@ function Workspace({ admin }: { admin: boolean }) {
   const base = admin ? "/admin" : "";
   useEffect(() => {
     let active = true;
+    let sessionInvalidated = false;
     const boot = async () => {
       setLoading(true);
       try {
@@ -147,12 +148,12 @@ function Workspace({ admin }: { admin: boolean }) {
         } else if (!storedToken()) return;
         const current = await api.profile(admin);
         if (admin && current.role !== "admin") throw Error("ACCESS_DENIED");
-        if (active) {
+        if (active && !sessionInvalidated) {
           setProfile(current);
           setError("");
         }
       } catch (e) {
-        if (active) setError(errorLabel(e));
+        if (active && !sessionInvalidated) setError(errorLabel(e));
       } finally {
         if (active) setLoading(false);
       }
@@ -160,6 +161,8 @@ function Workspace({ admin }: { admin: boolean }) {
     void boot();
     const lost = (event: Event) => {
       if ((event as CustomEvent).detail.admin !== admin) return;
+      sessionInvalidated = true;
+      setLoading(false);
       if (!admin) forgetToken();
       setProfile(null);
       setError(
@@ -173,6 +176,8 @@ function Workspace({ admin }: { admin: boolean }) {
       admin && configured
         ? client(true).auth.onAuthStateChange((event) => {
             if (event === "SIGNED_OUT") {
+              sessionInvalidated = true;
+              setLoading(false);
               setProfile(null);
               setError("Sessão administrativa encerrada.");
               navigate("/admin", { replace: true });

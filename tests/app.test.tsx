@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import App from "../src/App";
@@ -279,4 +279,26 @@ describe("administrator flow", () => {
       screen.getByRole("button", { name: "Sair da conta administrativa" }),
     ).not.toBeDisabled();
   });
+});
+
+it("does not restore administrative data from a response that arrives after session loss", async () => {
+  let finish: (value: typeof profile) => void = () => {};
+  mock.profile.mockReturnValue(
+    new Promise((resolve) => {
+      finish = resolve;
+    }),
+  );
+  open("/admin");
+  await waitFor(() => expect(mock.profile).toHaveBeenCalled());
+  await act(async () => {
+    window.dispatchEvent(
+      new CustomEvent("central:session-lost", { detail: { admin: true } }),
+    );
+  });
+  expect(await screen.findByLabelText("Senha")).toBeInTheDocument();
+  await act(async () => {
+    finish({ ...profile, role: "admin" });
+  });
+  expect(screen.getByLabelText("Senha")).toBeInTheDocument();
+  expect(mock.list).not.toHaveBeenCalled();
 });

@@ -76,10 +76,10 @@ Resultados em 24/10/2026:
 | Verificação | Resultado / limite |
 | --- | --- |
 | TypeScript e build de produção | Passou. Bundles separados para React e Supabase; fontes locais. |
-| Interface | 14 testes passaram: entrada, vazio, erro, filtros/contagens, campos preservados, cliques repetidos, conclusão concorrente, revisão antiga e saída com falha. |
+| Interface | 18 testes passaram: entrada, vazio, erro, filtros/contagens, campos preservados, cliques repetidos, conclusão concorrente, revisão antiga saída com falha, expiração de JWT, separação de sessões e resposta atrasada após encerramento. |
 | Banco descartável | 63 verificações/grupos passaram: isolamento, e-mail repetido, limites, permissões diretas, atomicidade com falha injetada, no-op, versão antiga, concorrência com bloqueio e revogação. |
 | Supabase real via chave pública | Passou: cadastro, lista/contagens vazias de outra identidade, abertura Crítica atômica, detalhes e comentários persistentes. |
-| Navegador integrado | Passou: abertura do exemplo, comentário por teclado, recarga, filtro vazio e retorno. Viewport pequeno efetivo de 453 px sem rolagem horizontal; não equivale a celular físico. |
+| Navegador integrado | Passou: abertura do exemplo, comentário por teclado, recarga, filtro vazio e retorno. Viewports pequenos efetivos de 360 e 453 px sem rolagem horizontal; não equivale a celular físico. |
 | Login e atendimento com a conta administrativa real | Pendente de login pelo instrutor no navegador local. Regras administrativas passaram no banco descartável e na interface automatizada; isso não comprova a jornada Auth real. |
 | Dependências | Auditoria sem vulnerabilidades reportadas na instalação verificada. |
 | Publicação, rede da turma, simultaneidade, celular físico e QR | Não verificados; fora da entrega local e dependentes de publicação autorizada. |
