@@ -16,7 +16,9 @@ Abra `http://127.0.0.1:5173/` para o solicitante e `/admin` para a administraç�
 
 O cabeçalho oferece **Área administrativa** na visão do solicitante e **Área do solicitante** no painel administrativo. Alternar preserva os dois acessos; sem sessão administrativa, o destino apresenta o login. **Sair** encerra apenas a sessão administrativa. O histórico do solicitante continua vinculado ao navegador, sem associação de identidades por e-mail.
 
-O `.env` existente foi preservado, permanece ignorado e tem permissão `600`. Em outro checkout, crie seu `.env` a partir dos nomes de `.env.example` e configure os valores pelo fluxo seguro do provedor. Apenas `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` são públicas. O build recusa chaves privilegiadas e outras variáveis com prefixo `VITE_`. Nunca forneça senhas ou tokens pelo chat ou os grave em arquivos versionados.
+A Vercel injeta metadados `VITE_VERCEL_*` durante o build. A configuração aceita esses nomes, mas os exclui do frontend: `envPrefix` continua limitado às duas variáveis públicas do Supabase. Outras variáveis `VITE_*` não autorizadas e chaves privilegiadas continuam causando erro. `npm run test:build-env` verifica seis cenários com builds reais e inspeciona o bundle para impedir exposição dos metadados ou de valores privados; esse comando também roda na CI.
+
+O `.env` existente foi preservado, permanece ignorado e tem permissão `600`. Em outro checkout, crie seu `.env` a partir dos nomes de `.env.example` e configure os valores pelo fluxo seguro do provedor. Apenas `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` são públicas. O build recusa chaves privilegiadas e variáveis `VITE_` inesperadas. Nunca forneça senhas ou tokens pelo chat ou os grave em arquivos versionados.
 
 A credencial aleatória do participante é emitida pelo banco e guardada no armazenamento local. Só o hash fica no schema privado. E-mail repetido cria outra identidade; não há recuperação por e-mail. Não são criados alunos no Auth. A conta administrativa existente é vinculada por provisionamento controlado; o aplicativo não oferece cadastro administrativo ou troca de senha.
 
@@ -78,6 +80,7 @@ Resultados em 24/10/2026:
 | Verificação | Resultado / limite |
 | --- | --- |
 | TypeScript e build de produção | Passou. Bundles separados para React e Supabase; fontes locais. |
+| Ambiente de build da Vercel | Passou: seis cenários de build real, incluindo metadados `VITE_VERCEL_*`, inspeção do bundle, bloqueio de variáveis extras e chaves privilegiadas e compatibilidade com chave anon. Build completo e 18 testes também passaram após a correção. |
 | Interface | 18 testes passaram: entrada, vazio, erro, filtros/contagens, campos preservados, cliques repetidos, conclusão concorrente, revisão antiga saída com falha, expiração de JWT, separação de sessões e resposta atrasada após encerramento. |
 | Banco descartável | 63 verificações/grupos passaram: isolamento, e-mail repetido, limites, permissões diretas, atomicidade com falha injetada, no-op, versão antiga, concorrência com bloqueio e revogação. |
 | Supabase real via chave pública | Passou: cadastro, lista/contagens vazias de outra identidade, abertura Crítica atômica, detalhes e comentários persistentes. |
@@ -93,7 +96,7 @@ Na atualização de navegação de 24/10/2026, o iCloud havia descarregado depen
 
 ## PR e sequência de release
 
-A implementação e sua atualização de navegação estão na PR #1. O fluxo de entrega inclui merge e publicação após os checks e a identificação do destino de produção. O destino Vercel ainda precisa ser definido; não há vínculo local, environment, variáveis, segredos ou deploys configurados no repositório na inspeção de 24/10/2026. A branch de implementação parte da `main` do repositório autorizado; a base inicial contém apenas documentação, pois o repositório estava vazio.
+A implementação e sua atualização de navegação foram integradas pela PR #1. O vínculo Git da Vercel foi identificado no status da main em 24/10/2026 e dispara builds automaticamente. A configuração do fluxo protegido descrito abaixo continua pendente: não há environment, variáveis ou segredos de Actions configurados na inspeção atual. Correções apenas de frontend/build não exigem nova migration; mudanças futuras de banco devem garantir a sequência antes de qualquer merge que dispare deploy.
 
 A CI da PR não recebe segredos de produção. O workflow de produção é manual, aceita somente `main`, exige CI verde para o commit exato e um environment `production` com revisores obrigatórios. Releases são serializados com `concurrency`, sem cancelar uma migration em andamento.
 
