@@ -14,6 +14,8 @@ npm run dev
 
 Abra `http://127.0.0.1:5173/` para o solicitante e `/admin` para a administração. A interface local grava no projeto Supabase real configurado; não é um banco de desenvolvimento independente. O servidor aceita somente loopback. Não exponha o servidor de desenvolvimento à rede.
 
+O cabeçalho oferece **Área administrativa** na visão do solicitante e **Área do solicitante** no painel administrativo. Alternar preserva os dois acessos; sem sessão administrativa, o destino apresenta o login. **Sair** encerra apenas a sessão administrativa. O histórico do solicitante continua vinculado ao navegador, sem associação de identidades por e-mail.
+
 O `.env` existente foi preservado, permanece ignorado e tem permissão `600`. Em outro checkout, crie seu `.env` a partir dos nomes de `.env.example` e configure os valores pelo fluxo seguro do provedor. Apenas `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` são públicas. O build recusa chaves privilegiadas e outras variáveis com prefixo `VITE_`. Nunca forneça senhas ou tokens pelo chat ou os grave em arquivos versionados.
 
 A credencial aleatória do participante é emitida pelo banco e guardada no armazenamento local. Só o hash fica no schema privado. E-mail repetido cria outra identidade; não há recuperação por e-mail. Não são criados alunos no Auth. A conta administrativa existente é vinculada por provisionamento controlado; o aplicativo não oferece cadastro administrativo ou troca de senha.
@@ -88,7 +90,7 @@ CA-L01/03–10/21–23 têm evidências combinadas de interface, SQL e integraç
 
 ## PR e sequência de release
 
-O pedido atual autoriza implementação local e PR preparada para merge. **Não houve merge nem publicação.** A branch de implementação parte da `main` do repositório autorizado; a base inicial contém apenas documentação, pois o repositório estava vazio.
+A implementação e sua atualização de navegação estão na PR #1. O fluxo de entrega inclui merge e publicação após os checks e a identificação do destino de produção. O destino Vercel ainda precisa ser definido; não há vínculo local, environment, variáveis, segredos ou deploys configurados no repositório na inspeção de 24/10/2026. A branch de implementação parte da `main` do repositório autorizado; a base inicial contém apenas documentação, pois o repositório estava vazio.
 
 A CI da PR não recebe segredos de produção. O workflow de produção é manual, aceita somente `main`, exige CI verde para o commit exato e um environment `production` com revisores obrigatórios. Releases são serializados com `concurrency`, sem cancelar uma migration em andamento.
 
@@ -97,7 +99,7 @@ Antes de habilitar publicação:
 1. Confirmar os IDs do projeto e da organização Vercel existentes e o endereço público. Não criar ou trocar destinos implicitamente.
 2. Configurar o environment protegido `production`, seus revisores, variáveis de identificação do Supabase e Vercel, as duas variáveis públicas do frontend e os segredos `SUPABASE_ACCESS_TOKEN` e `VERCEL_TOKEN` diretamente no provedor.
 3. Desativar qualquer deploy automático da integração Git da Vercel que pudesse contornar a sequência protegida. O merge, por si só, não deve publicar código dependente de migration ainda não verificada.
-4. Após autorização de merge/publicação, aguardar os checks/revisões da PR, fazer merge e executar o release manual do commit verde da `main`.
+4. Aguardar os checks/revisões da PR, fazer merge e executar o release manual do commit verde da `main`.
 5. O fluxo verifica hashes, aplica somente expansões compatíveis, compila, publica no projeto Vercel configurado e confere as rotas `/` e `/admin`. Depois, concluir a verificação real de autenticação, atendimento, rede e capacidade da turma.
 6. Definir `PUBLIC_APP_URL`, gerar o QR definitivo para a raiz pública sem credenciais e verificar sua leitura em celular. Nenhum QR de localhost foi gerado.
 

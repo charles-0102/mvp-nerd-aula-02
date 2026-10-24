@@ -284,6 +284,17 @@ function Workspace({ admin }: { admin: boolean }) {
           </span>
           <div className="topbar-actions">
             <span className="session-label">{profile.email}</span>
+            <Link
+              className="button secondary area-switch"
+              to={admin ? "/" : "/admin"}
+            >
+              {admin ? (
+                <ArrowLeft size={17} aria-hidden="true" />
+              ) : (
+                <ShieldCheck size={17} aria-hidden="true" />
+              )}
+              {admin ? "Área do solicitante" : "Área administrativa"}
+            </Link>
             {admin && (
               <button
                 className="icon-button"

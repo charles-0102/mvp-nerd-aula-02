@@ -520,11 +520,12 @@ label:first-child {
   flex-direction: column;
 }
 .topbar {
-  height: 79px;
+  min-height: 79px;
   background: #fbfcf9;
   border-bottom: 1px solid var(--line);
-  padding: 0 43px;
+  padding: 12px 43px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
@@ -543,9 +544,16 @@ label:first-child {
 }
 .topbar-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   align-items: center;
   min-width: 0;
+}
+.area-switch {
+  flex-shrink: 0;
+  padding: 9px 12px;
+  font-size: 12px;
+  min-height: 44px;
 }
 .session-label {
   font-size: 12px;
@@ -553,6 +561,7 @@ label:first-child {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 220px;
+  white-space: nowrap;
 }
 .workspace main {
   padding: 45px 43px 35px;
@@ -1212,7 +1221,7 @@ label:first-child {
     padding: 35px 27px;
   }
   .topbar {
-    padding: 0 27px;
+    padding: 12px 27px;
   }
   .request-row,
   .table-head {
@@ -1281,7 +1290,7 @@ label:first-child {
     margin-left: 78px;
   }
   .topbar {
-    height: 72px;
+    min-height: 72px;
   }
   .session-label {
     max-width: 180px;
@@ -1403,12 +1412,15 @@ label:first-child {
   }
   .topbar-label {
     font-size: 12px;
+    width: 100%;
   }
   .topbar-label > span {
     margin: 0 6px;
   }
   .topbar-actions {
     gap: 8px;
+    width: 100%;
+    justify-content: space-between;
   }
   .session-label {
     display: none;
