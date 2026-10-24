@@ -1,0 +1,47 @@
+{
+  "name": "central-de-demandas",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0 <23",
+    "npm": ">=10 <12"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "test:db": "node scripts/test-database.mjs",
+    "preflight": "node scripts/database.mjs preflight",
+    "db:apply": "node scripts/database.mjs apply",
+    "db:provision-admin": "node scripts/database.mjs provision",
+    "verify:remote": "node scripts/remote-smoke.mjs",
+    "check:secrets": "node scripts/check-secrets.mjs"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "5.2.8",
+    "@fontsource/manrope": "5.2.8",
+    "@supabase/supabase-js": "2.118.0",
+    "lucide-react": "0.468.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-router-dom": "7.18.4"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.2.0",
+    "@testing-library/user-event": "14.6.1",
+    "@types/node": "22.20.5",
+    "@types/react": "19.0.10",
+    "@types/react-dom": "19.0.4",
+    "@vitejs/plugin-react": "6.1.2",
+    "dotenv": "16.4.7",
+    "jsdom": "26.0.0",
+    "pg": "8.16.3",
+    "prettier": "3.6.2",
+    "typescript": "5.8.3",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}

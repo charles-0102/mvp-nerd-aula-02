@@ -1,0 +1,76 @@
+name: Protected production release
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: central-production-release
+  cancel-in-progress: false
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Require protected production environment and green CI for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          gh api "repos/$REPOSITORY/environments/production" > environment.json
+          jq -e '.protection_rules | any(.type == "required_reviewers" and (.reviewers | length > 0))' environment.json
+          gh api "repos/$REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$COMMIT&event=push" > runs.json
+          jq -e '.workflow_runs | any(.head_branch == "main" and .conclusion == "success")' runs.json
+  release:
+    needs: guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      SUPABASE_PROJECT_NAME: ${{ vars.SUPABASE_PROJECT_NAME }}
+      SUPABASE_DATABASE_PREFIX: ${{ vars.SUPABASE_DATABASE_PREFIX }}
+      SUPABASE_PRIVATE_SCHEMA: ${{ vars.SUPABASE_PRIVATE_SCHEMA }}
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.84.2
+      - run: npm ci
+      - name: Require explicit destinations and credentials
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$SUPABASE_PROJECT_REF"
+          test -n "$SUPABASE_PROJECT_NAME"
+          test -n "$VERCEL_TOKEN"
+          test -n "$VERCEL_ORG_ID"
+          test -n "$VERCEL_PROJECT_ID"
+          test -n "$VITE_SUPABASE_URL"
+          test -n "$VITE_SUPABASE_PUBLISHABLE_KEY"
+      - name: Bind Management API queries to the configured target
+        run: |
+          mkdir -p supabase/.temp
+          printf '%s' "$SUPABASE_PROJECT_REF" > supabase/.temp/project-ref
+      - run: npm run preflight
+      - name: Apply compatible expansions before publishing dependent code
+        run: npm run db:apply
+      - run: npm run build
+      - name: Deploy verified frontend to existing Vercel project
+        run: |
+          npx --yes vercel@65.2.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes vercel@65.2.0 build --prod --token="$VERCEL_TOKEN"
+          npx --yes vercel@65.2.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN" > deployment-url.txt
+          node scripts/verify-deployment.mjs
