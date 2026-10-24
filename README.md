@@ -82,11 +82,14 @@ Resultados em 24/10/2026:
 | Banco descartável | 63 verificações/grupos passaram: isolamento, e-mail repetido, limites, permissões diretas, atomicidade com falha injetada, no-op, versão antiga, concorrência com bloqueio e revogação. |
 | Supabase real via chave pública | Passou: cadastro, lista/contagens vazias de outra identidade, abertura Crítica atômica, detalhes e comentários persistentes. |
 | Navegador integrado | Passou: abertura do exemplo, comentário por teclado, recarga, filtro vazio e retorno. Viewports pequenos efetivos de 360 e 453 px sem rolagem horizontal; não equivale a celular físico. |
+| Alternância entre áreas | Passou: link no cabeçalho abre o login administrativo por teclado; o retorno mantém os dois pedidos existentes do solicitante. Viewport efetivo de 360 px sem rolagem horizontal, botão de 44 px de altura. O retorno a partir do painel já autenticado permanece dependente do login real abaixo. |
 | Login e atendimento com a conta administrativa real | Pendente de login pelo instrutor no navegador local. Regras administrativas passaram no banco descartável e na interface automatizada; isso não comprova a jornada Auth real. |
 | Dependências | Auditoria sem vulnerabilidades reportadas na instalação verificada. |
 | Publicação, rede da turma, simultaneidade, celular físico e QR | Não verificados; fora da entrega local e dependentes de publicação autorizada. |
 
 CA-L01/03–10/21–23 têm evidências combinadas de interface, SQL e integração pública. CA-L02/11–20/26 têm regras e componentes verificados, com a jornada administrativa Auth real ainda pendente. CA-L24 foi verificado parcialmente por teclado e viewport pequeno. CA-L25 passou para a configuração e escopo inspecionados. Os critérios completos e limites continuam no [PRD inicial](PRDs/PRD-Inicial.md). Evidências detalhadas ficam em `artifacts/`, ignorado pelo Git, sem credenciais no material entregue.
+
+Na atualização de navegação de 24/10/2026, o iCloud havia descarregado dependências locais (`dataless`), causando timeout de inicialização dos testes. Uma cópia temporária dos mesmos fontes e lockfile, fora do iCloud, passou nos 18 testes e no build após `npm ci`. O build usou somente as duas variáveis públicas e atualizou a prévia em localhost. A CI da revisão `1cd11a1` também passou com build, interface/API, banco descartável e auditoria.
 
 ## PR e sequência de release
 
