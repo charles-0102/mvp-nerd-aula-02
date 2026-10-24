@@ -4,7 +4,13 @@ import react from "@vitejs/plugin-react";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "VITE_");
   const allowed = ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"];
-  if (Object.keys(env).some((key) => !allowed.includes(key)))
+  // Vercel injects framework metadata into the build process. These names are
+  // tolerated here but deliberately excluded from the browser's envPrefix.
+  if (
+    Object.keys(env).some(
+      (key) => !allowed.includes(key) && !key.startsWith("VITE_VERCEL_"),
+    )
+  )
     throw Error(
       "Only the two documented public client variables may use VITE_.",
     );
